@@ -142,7 +142,6 @@ public class SOSParser {
                         //Check to see if get caps exists, if it does not actual parse the file
                         _log.debug("Cache enabled for GetCapabilities");
                         File f = new File(savePath + getCacheXmlFileName(threddsURI));
-                        
                         if (f.exists()) {
                             //if the file exists check the modified data against current data
                             long fileDateTime = f.lastModified();
@@ -203,7 +202,7 @@ public class SOSParser {
                             errHandler.setErrorExceptionOutput("Observation requests must have offering, observedProperty, responseFormat as query parameters");
                             retval.put("outputHandler", errHandler.getOutputHandler());
                             retval.put("responseContentType", "text/xml");
-                        } catch (Exception e) { }
+                        } catch (Exception e) { _log.error(e.toString()); }
                         break;
                     }
                     // setup our coordsHash

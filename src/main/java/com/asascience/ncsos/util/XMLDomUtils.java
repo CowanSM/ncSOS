@@ -23,7 +23,6 @@ import javax.xml.transform.stream.StreamResult;
  * @author abird
  */
 public class XMLDomUtils {
-//TODO add in refactored code for utils here!
 
     public static Document getTemplateDom(InputStream templateFileLocation) {
         Document doc = null;
@@ -174,6 +173,13 @@ public class XMLDomUtils {
     //METHOD OVERRIDE-------------------------------------------------------------
     public static Document addNodeAllOptions() {
         return null;
+    }
+    
+    public static Document addNodeAllOptions(Document doc, String parentName, Node childNode) {
+        NodeList parentList = doc.getElementsByTagName(parentName);
+        Node parent = parentList.item(0);
+        parent.appendChild(childNode);
+        return doc;
     }
     
     public static Document addNodeAllOptions(Document doc, String Obs, String nodeName, String value, int stationNumber) {

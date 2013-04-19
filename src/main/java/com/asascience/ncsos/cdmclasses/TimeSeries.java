@@ -228,8 +228,16 @@ public class TimeSeries extends baseCDMClass implements iStationData {
     public void setData(Object featureCollection) throws IOException {
         try {
             this.tsData = (StationTimeSeriesFeatureCollection) featureCollection;
+            _log.debug("number in reqStationNames: " + reqStationNames.size());
+            for (String stname: reqStationNames) {
+                _log.debug("requesting station: " + stname);
+            }
+            _log.debug("stations in tsData");
+            for (ucar.unidata.geoloc.Station st : tsData.getStations()) {
+                _log.debug(st.getName());
+            }
             tsStationList = tsData.getStations(reqStationNames);
-            
+            _log.debug("setting to number: " + tsStationList.size());
             setNumberOfStations(tsStationList.size());
 
             if (tsStationList.size() > 0) {
@@ -264,10 +272,12 @@ public class TimeSeries extends baseCDMClass implements iStationData {
                 setStartDate(df.toDateTimeStringISO(dtStart.toDate()));
                 setEndDate(df.toDateTimeStringISO(dtEnd.toDate()));
             }
+            
+            _log.debug("number of stations: " + getNumberOfStations());
         } catch (Exception ex) {
-            System.out.println("TimeSeries - setData; exception:\n" + ex.toString());
+            _log.error("TimeSeries - setData; exception:\n" + ex.toString());
             for(StackTraceElement e : ex.getStackTrace()) {
-                System.out.println(e.toString());
+                _log.error(e.toString());
             }
             throw new IOException(ex.toString());
         }
@@ -288,7 +298,7 @@ public class TimeSeries extends baseCDMClass implements iStationData {
 
     @Override
     public String getStationName(int idNum) {
-        if (tsData != null) {
+        if (tsData != null && getNumberOfStations() > idNum) {
             return (tsStationList.get(idNum).getName());
         } else {
             return Invalid_Station;

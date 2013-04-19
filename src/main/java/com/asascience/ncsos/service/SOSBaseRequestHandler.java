@@ -26,18 +26,19 @@ public abstract class SOSBaseRequestHandler {
 
     private static final String STATION_GML_BASE = "urn:ioos:station:";
     private static final String SENSOR_GML_BASE = "urn:ioos:sensor:";
+    private static final String DEF_NAMING_AUTHORITY = "authority";  // TODO: default for naming_authority
     private static final NumberFormat FORMAT_DEGREE;
-    private final NetcdfDataset netCDFDataset;
     private FeatureDataset featureDataset;
     private FeatureCollection CDMPointFeatureCollection;
     private GridDataset gridDataSet = null;
     
     // Global Attributes
     protected String Access, DataContactEmail, DataContactName, DataContactPhone, DataPage, InventoryContactEmail, InventoryContactName, InventoryContactPhone;
-    protected String PrimaryOwnership, Region, StandardNameVocabulary, title, history, description, featureOfInterestBaseQueryURL;
+    protected String PrimaryOwnership, Region, StandardNameVocabulary, title, history, description, featureOfInterestBaseQueryURL, featureType;
     private static String namingAuthority;
     
     // Variables and other information commonly needed
+    protected final NetcdfDataset netCDFDataset;
     protected Variable latVariable, lonVariable, timeVariable, depthVariable;
     protected Variable stationVariable;
     private HashMap<Integer, String> stationNames;
@@ -75,6 +76,7 @@ public abstract class SOSBaseRequestHandler {
         }
         // if dataFeatureType is none/null (not GRID) get the point feature collection
         if (dataFeatureType == null || dataFeatureType == FeatureType.NONE) {
+            _log.debug("Getting point feature collection");
             CDMPointFeatureCollection = DiscreteSamplingGeometryUtil.extractFeatureDatasetCollection(featureDataset);
             dataFeatureType = CDMPointFeatureCollection.getCollectionFeatureType();
         }
@@ -162,9 +164,10 @@ public abstract class SOSBaseRequestHandler {
         description = netCDFDataset.findAttValueIgnoreCase(null, "description", "");
         featureOfInterestBaseQueryURL = netCDFDataset.findAttValueIgnoreCase(null, "featureOfInterestBaseQueryURL", null);
         StandardNameVocabulary = netCDFDataset.findAttValueIgnoreCase(null, "standard_name_vocabulary", "none");
-        namingAuthority = netCDFDataset.findAttValueIgnoreCase(null, "naming_authority", "sos");
+        featureType = netCDFDataset.findAttValueIgnoreCase(null, "featureType", "unknown");
+        namingAuthority = netCDFDataset.findAttValueIgnoreCase(null, "naming_authority", DEF_NAMING_AUTHORITY);
         if (namingAuthority.length() < 1)
-            namingAuthority = "sos";
+            namingAuthority = DEF_NAMING_AUTHORITY;
     }
 
     /**
@@ -223,7 +226,7 @@ public abstract class SOSBaseRequestHandler {
     private void parseSensorNames() {
         // find all variables who's not a coordinate axis and does not have 'station' in the name
         this.sensorNames = new ArrayList<String>();
-        getFeatureDataset().getDataVariables();
+//        getFeatureDataset().getDataVariables();
         for (Iterator<VariableSimpleIF> it = getFeatureDataset().getDataVariables().iterator(); it.hasNext();) {
             VariableSimpleIF var = it.next();
             String name = var.getShortName();
@@ -251,7 +254,8 @@ public abstract class SOSBaseRequestHandler {
             NestedPointFeatureCollectionIterator npfci = npfc.getNestedPointFeatureCollectionIterator(-1);
             while (npfci.hasNext()) {
                 NestedPointFeatureCollection nnpfc = npfci.next();
-                String name = nnpfc.getName().replaceAll("[\\s]+", "");
+//                String name = nnpfc.getName().replaceAll("[\\s]+", "");
+                String name = nnpfc.getName();
                 stationNames.put(stationIndex, name);
                 stationIndex += 1;
             }
@@ -273,7 +277,8 @@ public abstract class SOSBaseRequestHandler {
      * @throws IOException 
      */
     private int parsePointFeatureCollectionNames(PointFeatureCollection pfc, int stationIndex) throws IOException {
-        String name = pfc.getName().replaceAll("[\\s]+", "");
+//        String name = pfc.getName().replaceAll("[\\s]+", "");
+        String name = pfc.getName();
         stationNames.put(stationIndex, name);
         return stationIndex+1;
     }
@@ -309,7 +314,8 @@ public abstract class SOSBaseRequestHandler {
             NestedPointFeatureCollectionIterator npfci = npfc.getNestedPointFeatureCollectionIterator(-1);
             for (;npfci.hasNext();) {
                 NestedPointFeatureCollection n = npfci.next();
-                String name = n.getName().replaceAll("[\\s]+", "");
+//                String name = n.getName().replaceAll("[\\s]+", "");
+                String name = n.getName();
                 this.stationNames.put(stationindex++, "Trajectory"+name);
             }
         } else {
@@ -317,7 +323,8 @@ public abstract class SOSBaseRequestHandler {
             PointFeatureCollectionIterator pfci = npfc.getPointFeatureCollectionIterator(-1);
             for (;pfci.hasNext();) {
                 PointFeatureCollection n = pfci.next();
-                String name = n.getName().replaceAll("[\\s]+", "");
+//                String name = n.getName().replaceAll("[\\s]+", "");
+                String name = n.getName();
                 this.stationNames.put(stationindex++, "Trajectory"+name);
             }
         }
@@ -651,7 +658,6 @@ public abstract class SOSBaseRequestHandler {
     public ArrayList<String> getCoordinateNames() {
         ArrayList<String> retval = new ArrayList<String>();
         for (CoordinateTransform ct : netCDFDataset.getCoordinateTransforms()) {
-            System.out.println(ct.getName());
             retval.add(ct.getName());
         }
         return retval;
@@ -702,6 +708,10 @@ public abstract class SOSBaseRequestHandler {
     
     public String getDescription() {
         return description;
+    }
+    
+    public String getFeatureType() {
+        return featureType;
     }
 
 }

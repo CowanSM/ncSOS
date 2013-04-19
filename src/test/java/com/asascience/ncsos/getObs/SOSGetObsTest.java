@@ -29,6 +29,7 @@ public class SOSGetObsTest {
    
     // final strings
     private static final String baseRequest = "request=GetObservation&version=1.0.0&service=sos&responseformat=text%2Fxml%3Bsubtype%3D%22om%2F1.0.0%22";
+    private static final String IoosSosRequest = "request=GetObservation&version=1.0.0&service=sos&responseFormat=text%2Fxml%3Bsubtype%3D%22om%2F1.0.0%2Fprofiles%2Fioos_sos%2F1.0%22";
     
     private static final String imeds1 = "resources/datasets/sura/Hsig_UNDKennedy_IKE_VIMS_3D_WAVEONLY.nc";
     private static final String imeds1Req = baseRequest + "&observedProperty=hs&offering=UNDKennedy_S,UNDKennedy_X,UNDKennedy_Z&eventtime=1990-01-01T00:00:00Z/2009-01-01T00:00:00Z";
@@ -74,7 +75,7 @@ public class SOSGetObsTest {
     private static final String timeSeriesIncompleteMulti = baseRequest + "&observedProperty=temperature&offering=Station-9&eventtime=1990-01-01T00:00:00Z/1990-01-01T10:00:00Z";
     private static final String timeSeriesIncompleteMultiInvalid = baseRequest + "&observedProperty=temperature&offering=Station-9&eventtime=1990-02-01T00:00:00Z/1990-05-01T10:00:00Z";
     private static final String timeSeriesIncompleteMultiStation = baseRequest + "&observedProperty=temperature&offering=Station-9,Station-8&eventtime=1990-01-01T00:00:00Z/1990-01-01T8:00:00Z";
-    private static final String timeSeriesIncompleteMultiStationx3 = baseRequest + "&observedProperty=temperature&offering=urn:ioos:station:sos:Station-9,urn:ioos:station:sos:Station-8,urn:ioos:station:sos:Station-7&eventtime=1990-01-01T00:00:00Z/1990-01-01T8:00:00Z";
+    private static final String timeSeriesIncompleteMultiStationx3 = baseRequest + "&observedProperty=temperature&offering=urn:ioos:station:authority:Station-9,urn:ioos:station:authority:Station-8,urn:ioos:station:authority:Station-7&eventtime=1990-01-01T00:00:00Z/1990-01-01T8:00:00Z";
     
     private static final String tsOrthogonalMultidimenstionalMultipleStations = "resources/datasets/timeSeries-Orthogonal-Multidimenstional-MultipleStations-H.2.1/timeSeries-Orthogonal-Multidimenstional-MultipleStations-H.2.1.nc";
     private static final String timeSeriestOrth = baseRequest + "&observedProperty=alt&offering=Station-1&eventtime=1990-01-01T00:00:00Z";
@@ -173,6 +174,13 @@ public class SOSGetObsTest {
     private static final String networkAllTrajectoryProfile2Request = baseRequest + "&observedProperty=temperature&offering=network-all";
     private static final String networkAllTrajectoryProfile3 = datasets + "trajectoryProfile-Ragged-MultipleTrajectories-H.6.3/trajectoryProfile-Ragged-MultipleTrajectories-H.6.3.nc";
     private static final String networkAllTrajectoryProfile3Request = baseRequest + "&observedProperty=temperature&offering=network-all";
+    
+    // IoosSos1.0 response format
+    private static final String kachemakBay = datasets + "nodc/KachemakBay.nc";
+    private static final String timeSeriesIncompIoosSosRequest1 = IoosSosRequest + "&observedProperty=temperature,humidity&offering=Station-1,Station-3&eventtime=1990-01-01T00:00:00Z";
+    private static final String pointIoosSosRequest1 = IoosSosRequest + "&observedProperty=fluorene&offering=network-all&eventtime=1990-01-01T00:00:48Z";
+    private static final String bodegaMarineLabBuoy = datasets + "nodc/BodegaMarineLabBuoy.nc";
+    private static final String bodegaIoosRequest1 = IoosSosRequest + "&observedProperty=density,temperature,salinity&offering=Cordell Bank Buoy&eventtime=140835-01-26T00:00:00Z/140835-12-31T23:59:59";
     
     @BeforeClass
     public static void SetupEnviron() {
@@ -1030,7 +1038,7 @@ public class SOSGetObsTest {
             //check depth was entered auto
             assertFalse(write.toString().contains("Exception"));
             assertTrue("depth not added", write.toString().contains("<swe:field name=\"z\">"));
-            assertTrue("data missing - feature of interest", write.toString().contains("<om:featureOfInterest xlink:href=\"urn:ioos:station:sos:Profile3\"/>"));
+            assertTrue("data missing - feature of interest", write.toString().contains("<om:featureOfInterest xlink:href=\"urn:ioos:station:authority:Profile3\"/>"));
             assertFalse("bad data included - time stamp", write.toString().contains("1990-01-01T01:00:00Z,"));
             assertFalse("bad data included - time stamp", write.toString().contains("1990-01-01T02:00:00Z,"));
             // write as an example
@@ -1059,10 +1067,10 @@ public class SOSGetObsTest {
             dataAvailableInOutputFile(write);
             //check depth was entered auto
             assertTrue("depth not added", write.toString().contains("<swe:field name=\"z\">"));
-            assertFalse("invalid foi", write.toString().contains("<om:featureOfInterest xlink:href=\"urn:ioos:station:sos:PROFILE_0\"/>"));
-            assertFalse("invalid foi", write.toString().contains("<om:featureOfInterest xlink:href=\"urn:ioos:station:sos:PROFILE_3\"/>"));
-            assertTrue("foi missing", write.toString().contains("<om:featureOfInterest xlink:href=\"urn:ioos:station:sos:Profile1\"/>"));
-            assertTrue("foi missing", write.toString().contains("<om:featureOfInterest xlink:href=\"urn:ioos:station:sos:Profile2\"/>"));
+            assertFalse("invalid foi", write.toString().contains("<om:featureOfInterest xlink:href=\"urn:ioos:station:authority:PROFILE_0\"/>"));
+            assertFalse("invalid foi", write.toString().contains("<om:featureOfInterest xlink:href=\"urn:ioos:station:authority:PROFILE_3\"/>"));
+            assertTrue("foi missing", write.toString().contains("<om:featureOfInterest xlink:href=\"urn:ioos:station:authority:Profile1\"/>"));
+            assertTrue("foi missing", write.toString().contains("<om:featureOfInterest xlink:href=\"urn:ioos:station:authority:Profile2\"/>"));
             assertTrue("data missing", write.toString().contains("1990-01-01T01:00:00Z,"));
             assertTrue("data missing", write.toString().contains("1990-01-01T02:00:00Z,"));
         } catch (IOException ex) {
@@ -1675,7 +1683,6 @@ public class SOSGetObsTest {
         }
     }
     
-    // TODO - fix this shit, oostehtysswe is out dated
     @Ignore
     @Test
     public void testNetworkAllProfileIndexedRaggedMultiProfiles() {
@@ -1809,6 +1816,69 @@ public class SOSGetObsTest {
             dataAvailableInOutputFile(write);
             // write as an example
             fileWriter(exampleOutputDir, "GetObservation-TimeSeries-om1.0.0.xml", write);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            System.out.println("------END " + getCurrentMethod() + "------");
+        }
+    }
+    
+    @Test
+    public void testIoosSosTimeSeries() {
+        System.out.println("\n------" + getCurrentMethod() + "------");
+        
+        try {
+            NetcdfDataset dataset = NetcdfDataset.openDataset(tsIncompleteMultiDimensionalMultipleStations);
+            SOSParser md = new SOSParser();
+            Writer write = new CharArrayWriter();
+            writeOutput(md.enhanceGETRequest(dataset, timeSeriesIncompIoosSosRequest1, tsIncompleteMultiDimensionalMultipleStations), write);
+            write.flush();
+            write.close();
+            String fileName = getCurrentMethod() + ".xml";
+            fileWriter(base, fileName, write);
+            assertFalse("exception in output", write.toString().contains("Exception"));
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            System.out.println("------END " + getCurrentMethod() + "------");
+        }
+    }
+    
+    @Test
+    public void testIoosSosPointKachemak() {
+        System.out.println("\n------" + getCurrentMethod() + "------");
+        
+        try {
+            NetcdfDataset dataset = NetcdfDataset.openDataset(kachemakBay);
+            SOSParser md = new SOSParser();
+            Writer write = new CharArrayWriter();
+            writeOutput(md.enhanceGETRequest(dataset, pointIoosSosRequest1, kachemakBay), write);
+            write.flush();
+            write.close();
+            String fileName = getCurrentMethod() + ".xml";
+            fileWriter(base, fileName, write);
+            assertFalse("exception in output", write.toString().contains("Exception"));
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            System.out.println("------END " + getCurrentMethod() + "------");
+        }
+    }
+    
+    @Test
+    public void testIoosBodegaMarineLabBuoy() {
+        System.out.println("\n------" + getCurrentMethod() + "------");
+        
+        try {
+            NetcdfDataset dataset = NetcdfDataset.openDataset(bodegaMarineLabBuoy);
+            SOSParser md = new SOSParser();
+            Writer write = new CharArrayWriter();
+            writeOutput(md.enhanceGETRequest(dataset, bodegaIoosRequest1, bodegaMarineLabBuoy), write);
+            write.flush();
+            write.close();
+            String fileName = getCurrentMethod() + ".xml";
+            fileWriter(base, fileName, write);
+            assertFalse("exception in output", write.toString().contains("Exception"));
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         } finally {

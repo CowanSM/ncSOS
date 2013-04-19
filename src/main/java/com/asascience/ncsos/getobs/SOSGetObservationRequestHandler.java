@@ -2,7 +2,7 @@ package com.asascience.ncsos.getobs;
 
 import com.asascience.ncsos.cdmclasses.*;
 import com.asascience.ncsos.outputformatter.GetCapsOutputter;
-import com.asascience.ncsos.outputformatter.OosTethysSwe;
+import com.asascience.ncsos.outputformatter.IoosSos10;
 import com.asascience.ncsos.outputformatter.OosTethysSweV2;
 import com.asascience.ncsos.service.SOSBaseRequestHandler;
 import java.io.IOException;
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
 import ucar.nc2.Variable;
 import ucar.nc2.constants.AxisType;
@@ -33,6 +32,9 @@ public class SOSGetObservationRequestHandler extends SOSBaseRequestHandler {
     private String contentType;
     
     private static final String FILL_VALUE_NAME = "_FillValue";
+    private static final String IOOSSOS_RF = "text/xml;subtype=\"om/1.0.0/profiles/ioos_sos/1.0\"";
+    
+    private final List<String> eventTimes;
 
     /**
      * SOS get obs request handler
@@ -52,11 +54,20 @@ public class SOSGetObservationRequestHandler extends SOSBaseRequestHandler {
             Map<String, String> latLonRequest) throws IOException {
         super(netCDFDataset);
         
+        if (eventTime != null && eventTime.length > 0)
+            eventTimes = Arrays.asList(eventTime);
+        else
+            eventTimes = new ArrayList<String>();
+        
         // set up our formatter
         if(outputFormat.equalsIgnoreCase("text/xml;subtype=\"om/1.0.0\"")) {
             contentType = "text/xml";
 //            output = new OosTethysSwe(this.obsProperties, getFeatureDataset(), CDMDataSet, netCDFDataset);
             output = new OosTethysSweV2(this);
+        } else if (outputFormat.equalsIgnoreCase(IOOSSOS_RF)) {
+            _log.debug("Creating IoosSos10 output");
+            contentType = "text/xml";
+            output = new IoosSos10(this);
         } else {
             _log.error("Uknown/Unhandled responseFormat: " + outputFormat);
             output = new GetCapsOutputter();
@@ -210,6 +221,29 @@ public class SOSGetObservationRequestHandler extends SOSBaseRequestHandler {
     }
     
     /**
+     * Returns the 'standard_name' attribute of a variable, if it exists
+     * @param varName the name of the variable
+     * @return the 'standard_name' if it exists, otherwise ""
+     */
+    public String getVariableStandardName(String varName) {
+        String retval = "";
+        
+        for (Variable var : netCDFDataset.getVariables()) {
+            if (varName.equalsIgnoreCase(var.getFullName())) {
+                Attribute attr = var.findAttribute("standard_name");
+                if (attr != null)
+                    retval = attr.getStringValue();
+            }
+        }
+        
+        return retval;
+    }
+    
+    public List<String> getRequestedEventTimes() {
+        return this.eventTimes;
+    }
+    
+    /**
      * Gets the dataset wrapped by the cdm feature type giving multiple easy to 
      * access functions
      * @return dataset wrapped by iStationData
@@ -258,6 +292,16 @@ public class SOSGetObservationRequestHandler extends SOSBaseRequestHandler {
     
     public String getEndTime(int relIndex) {
         return CDMDataSet.getTimeEnd(relIndex);
+    }
+    
+    public String[] getRequestedObservedProperties() {
+        CoordinateAxis heightAxis = netCDFDataset.findCoordinateAxis(AxisType.Height);
+        ArrayList<String> retval = new ArrayList<String>();
+        for (String str : obsProperties) {
+            if (!str.equalsIgnoreCase(heightAxis.getFullName()))
+                retval.add(str);
+        }
+        return (String[]) retval.toArray(new String[retval.size()]);
     }
     
     public String[] getObservedProperties() {
