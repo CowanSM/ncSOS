@@ -181,6 +181,17 @@ public class SOSGetObsTest {
     private static final String pointIoosSosRequest1 = IoosSosRequest + "&observedProperty=fluorene&offering=network-all&eventtime=1990-01-01T00:00:48Z";
     private static final String bodegaMarineLabBuoy = datasets + "nodc/BodegaMarineLabBuoy.nc";
     private static final String bodegaIoosRequest1 = IoosSosRequest + "&observedProperty=density,temperature,salinity&offering=Cordell Bank Buoy&eventtime=140835-01-26T00:00:00Z/140835-12-31T23:59:59";
+    // TODO: below are currently unsupported by IOOS response format, once they are
+    // tests will need to be re-written for them to reflect that
+    
+    // uses networkAllTrajectory1 dataset
+    private static final String ioosTrajectoryRequest = IoosSosRequest + "&observedProperty=temperature&offering=Trajectory1,Trajectory2,Trajectory4";
+    // uses networkAllTimeSeriesProfile1 dataset
+    private static final String ioosTimeSeriesProfileRequest = IoosSosRequest + "&observedProperty=temperature&offering=network-all&eventTime=1990-01-01T04:00:00Z";
+    // uses networkAllProfile1 dataset
+    private static final String ioosProfileRequest = IoosSosRequest + "&observedProperty=temperature,humidity&offering=Profile10,Profile42";
+    // uses networkAllTrajectoryProfile1 dataset
+    private static final String ioosTrajectoryProfileRequest = IoosSosRequest + "&observedProperty=salinity&offering=Trajectory0,Trajectory5";
     
     @BeforeClass
     public static void SetupEnviron() {
@@ -1857,7 +1868,8 @@ public class SOSGetObsTest {
             write.close();
             String fileName = getCurrentMethod() + ".xml";
             fileWriter(base, fileName, write);
-            assertFalse("exception in output", write.toString().contains("Exception"));
+            // point
+            assertTrue("no exception in output", write.toString().contains("Exception"));
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         } finally {
@@ -1879,6 +1891,90 @@ public class SOSGetObsTest {
             String fileName = getCurrentMethod() + ".xml";
             fileWriter(base, fileName, write);
             assertFalse("exception in output", write.toString().contains("Exception"));
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            System.out.println("------END " + getCurrentMethod() + "------");
+        }
+    }
+    
+    @Test
+    public void testIoosTrajectory() {
+        System.out.println("\n------" + getCurrentMethod() + "------");
+        
+        try {
+            NetcdfDataset dataset = NetcdfDataset.openDataset(networkAllTrajectory1);
+            SOSParser md = new SOSParser();
+            Writer write = new CharArrayWriter();
+            writeOutput(md.enhanceGETRequest(dataset, ioosTrajectoryRequest, networkAllTrajectory1), write);
+            write.flush();
+            write.close();
+            String fileName = getCurrentMethod() + ".xml";
+            fileWriter(base, fileName, write);
+            assertTrue("no exception in output", write.toString().contains("Exception"));
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            System.out.println("------END " + getCurrentMethod() + "------");
+        }
+    }
+    
+    @Test
+    public void testIoosProfile() {
+        System.out.println("\n------" + getCurrentMethod() + "------");
+        
+        try {
+            NetcdfDataset dataset = NetcdfDataset.openDataset(networkAllProfile1);
+            SOSParser md = new SOSParser();
+            Writer write = new CharArrayWriter();
+            writeOutput(md.enhanceGETRequest(dataset, ioosProfileRequest, networkAllProfile1), write);
+            write.flush();
+            write.close();
+            String fileName = getCurrentMethod() + ".xml";
+            fileWriter(base, fileName, write);
+            assertTrue("no exception in output", write.toString().contains("Exception"));
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            System.out.println("------END " + getCurrentMethod() + "------");
+        }
+    }
+    
+    @Test
+    public void testIoosTimeSeriesProfile() {
+        System.out.println("\n------" + getCurrentMethod() + "------");
+        
+        try {
+            NetcdfDataset dataset = NetcdfDataset.openDataset(networkAllTimeSeriesProfile1);
+            SOSParser md = new SOSParser();
+            Writer write = new CharArrayWriter();
+            writeOutput(md.enhanceGETRequest(dataset, ioosTimeSeriesProfileRequest, networkAllTimeSeriesProfile1), write);
+            write.flush();
+            write.close();
+            String fileName = getCurrentMethod() + ".xml";
+            fileWriter(base, fileName, write);
+            assertTrue("no exception in output", write.toString().contains("Exception"));
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            System.out.println("------END " + getCurrentMethod() + "------");
+        }
+    }
+    
+    @Test
+    public void testIoosTrajectoryProfile() {
+        System.out.println("\n------" + getCurrentMethod() + "------");
+        
+        try {
+            NetcdfDataset dataset = NetcdfDataset.openDataset(networkAllTrajectoryProfile1);
+            SOSParser md = new SOSParser();
+            Writer write = new CharArrayWriter();
+            writeOutput(md.enhanceGETRequest(dataset, ioosTrajectoryProfileRequest, networkAllTrajectoryProfile1), write);
+            write.flush();
+            write.close();
+            String fileName = getCurrentMethod() + ".xml";
+            fileWriter(base, fileName, write);
+            assertTrue("no exception in output", write.toString().contains("Exception"));
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         } finally {

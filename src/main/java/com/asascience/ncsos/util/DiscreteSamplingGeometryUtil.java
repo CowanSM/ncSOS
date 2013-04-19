@@ -9,9 +9,7 @@ import ucar.nc2.constants.CF;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dt.GridDataset;
 import ucar.nc2.ft.*;
-import ucar.nc2.ft.grid.Grid;
 import ucar.nc2.ft.point.StationPointFeature;
-import ucar.nc2.ft.point.StationTimeSeriesCollectionFlattened;
 
 /**
  *
@@ -45,7 +43,7 @@ public class DiscreteSamplingGeometryUtil {
                         //System.out.println("profile feature");
                     } else if (featureCollection instanceof ProfileFeatureCollection) {
                         //System.out.println("profile feature collection");
-                    } else if (featureCollection instanceof Grid) {
+//                    } else if (featureCollection instanceof Grid) {
                         //System.out.println("profile feature collection");
                     } else if (featureCollection instanceof TrajectoryFeature) {
                         //System.out.println("profile feature collection");
@@ -225,60 +223,48 @@ public class DiscreteSamplingGeometryUtil {
                     FeatureCollection featureCollection = featureCollectionList.get(0);
 
                     if (featureCollection instanceof StationTimeSeriesFeatureCollection) {
-                        System.err.println("StationTimeSeriesFeatureCollection");
                         return (StationTimeSeriesFeatureCollection) featureCollection;
                         
                     } else if (featureCollection instanceof StationProfileFeatureCollection) {
-                        System.err.println("StationProfileFeatureCollection");
                         return (StationProfileFeatureCollection) featureCollection;
                         
                     } else if (featureCollection instanceof StationPointFeature) {
-                        System.err.println("StationPointFeature");
                         return (PointFeatureCollection) featureCollection;
                         //System.out.println("point feature");
                         
                     } else if (featureCollection instanceof StationProfileFeature) {
-                        System.err.println("StationProfileFeature");
                         return (StationProfileFeatureCollection) featureCollection;
                         //System.out.println("profile feature");
                         
                     } else if (featureCollection instanceof StationTimeSeriesFeature) {
-                        System.err.println("StationTimeSeriesFeature");
                         return (StationTimeSeriesFeatureCollection) featureCollection;
                         //System.out.println("StationTimeSeriesFeature feature");
                         
                     } else if (featureCollection instanceof ProfileFeature) {
-                        System.err.println("ProfileFeature");
                         return (ProfileFeatureCollection) featureCollection;
                         //System.out.println("profile feature");
                         
                     } else if (featureCollection instanceof ProfileFeatureCollection) {
-                        System.err.println("ProfileFeatureCollection");
                         return (ProfileFeatureCollection) featureCollection;
                         
                     } else if (featureCollection instanceof TrajectoryFeature) {
-                        System.err.println("TrajectoryFeature");
                         return (TrajectoryFeature) featureCollection;
                         
                     } else if (featureCollection instanceof TrajectoryFeatureCollection) {
-                        System.err.println("TrajectoryFeatureCollection");
                         return (TrajectoryFeatureCollection) featureCollection;
                         
                     } else if (featureCollection instanceof PointFeatureCollection) {
-                        System.err.println("PointFeatureCollection");
                         return (PointFeatureCollection) featureCollection;
                         
                     } else if (featureCollection instanceof SectionFeature) {
-                        System.err.println("SectionFeature");
                         return (SectionFeature) featureCollection;
                         
                     } else if (featureCollection instanceof SectionFeatureCollection) {
-                        System.err.println("SectionFeatureCollection");
                         return (SectionFeatureCollection) featureCollection;
                         
                     }
                     else {
-                        System.out.println("Unable to find the feature dataset collection of " + featureCollection.getName());
+                        System.err.println("Unable to find the feature dataset collection of " + featureCollection.getName());
                     }
                     //********** 
 
