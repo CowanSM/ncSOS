@@ -12,7 +12,7 @@ import com.asascience.ncsos.outputformatter.DescribeSensorFormatter;
  * @author SCowan
  * @version 1.0.0
  */
-public interface SOSDescribeIF {
+public interface ISOSDescribeSensor {
     /**
      * Tells the output handler to set up the response to a Describe Sensor request
      * so that when writeOutput is called by the controller, all data for the response

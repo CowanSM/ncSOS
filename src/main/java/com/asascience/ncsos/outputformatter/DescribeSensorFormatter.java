@@ -210,6 +210,14 @@ public class DescribeSensorFormatter implements SOSOutputFormatter {
     }
     
     /**
+     * Sets the text content of the gml:name node
+     * @param name name (urn) of the station
+     */
+    public void setName(String name) {
+        document.getElementsByTagName("gml:name").item(0).setTextContent(name);
+    }
+    
+    /**
      * Removes the gml:description node from the xml document
      */
     public void deleteDescriptionNode() {
@@ -240,6 +248,27 @@ public class DescribeSensorFormatter implements SOSOutputFormatter {
     }
     
     /**
+     * adds nodes to the sml:IdentifierList element
+     * @param name name of the identifier
+     * @param definition definition of the identifier
+     * @param value  value of the sml:value node in the identifier
+     */
+    public void addSmlIdentifier(String name, String definition, String value) {
+        /* Adds the following to the sml:IdentifierList
+         * <sml:identifier name='name'>
+         *   <sml:Term definition='definition'>
+         *     <sml:value>value</sml:value>
+         *   </sml:Term>
+         * </sml:identifier>
+         */
+        Element parent = (Element) document.getElementsByTagName("sml:IdentifierList").item(0);
+        
+        Element ident = addNewNodeToParentWithAttribute("sml:identifier", parent, "name", name);
+        ident = addNewNodeToParentWithAttribute("sml:Term", ident, "definition", definition);
+        addNewNodeToParentWithTextValue("sml:value", ident, value);
+    }
+    
+    /**
      * Removes the sml:identification node from the xml document
      */
     public void deleteIdentificationNode() {
@@ -258,12 +287,74 @@ public class DescribeSensorFormatter implements SOSOutputFormatter {
         parent = addNewNodeToParentWithAttribute("sml:Term", parent, "definition", definition);
         addNewNodeToParentWithTextValue("sml:value", parent, classifierValue);
     }
+
+    /**
+     * Adds a sml:classifier to sml:ClassifierList
+     * @param name name of the classifier
+     * @param definition definition of the term
+     * @param codeSpace codeSpace of the classifier
+     * @param value value of the classifier
+     */
+    public void addSmlClassifier(String name, String definition, String codeSpace, String value) {
+        /*
+         * <sml:classifier name='name'>
+         *   <sml:Term definition='definition'>
+         *     <sml:codeSpace xlink:href="http://mmisw.org/ont/ioos/" + 'codeSpace'>
+         *     <sml:value>'value'</sml:value>
+         *   </sml:Term>
+         * </sml:classifier>
+         */
+        Element parent = (Element) document.getElementsByTagName("sml:ClassifierList").item(0);
+        parent = addNewNodeToParentWithAttribute("sml:classifier", parent, "name", name);
+        parent = addNewNodeToParentWithAttribute("sml:Term", parent, "definition", definition);
+        addNewNodeToParentWithAttribute("sml:codeSpace", parent, "xlink:href", "http://mmisw.org/ont/ioos/" + codeSpace);
+        addNewNodeToParentWithTextValue("sml:value", parent, value);
+    }
     
     /**
      * Removes the sml:classification node from the xml document
      */
     public void deleteClassificationNode() {
         getParentNode().removeChild(getParentNode().getElementsByTagName("sml:classification").item(0));
+    }
+    
+    /**
+     * Set the sml:validTime node
+     * @param timeBegin the beginPosition value
+     * @param timeEnd the endPosition value
+     */
+    public void setValidTime(String timeBegin, String timeEnd) {
+        /*
+         * <gml:TimePeriod>
+         *   <gml:beginPosition>'timeBegin'</gml:beginPosition>
+         *   <gml:endPosition>'timeEnd'</gml:endPosition>
+         * </gml:TimePeriod>
+         */
+        Element parent = (Element) document.getElementsByTagName("sml:validTime").item(0);
+        parent = addNewNodeToParent("gml:TimePeriod", parent);
+       addNewNodeToParentWithTextValue("gml:beginPosition", parent, timeBegin);
+       addNewNodeToParentWithTextValue("gml:endPosition", parent, timeEnd);
+    }
+    
+    /**
+     * Adds a sml:capabilities node that defines a metadata property for the sensor
+     * @param name name of the capability
+     * @param title name of the metadata
+     * @param href reference to the metadata
+     */
+    public void addSmlCapabilities(String name, String title, String href) {
+        /*
+         * <sml:capabilities name='name'>
+         *   <swe:SimpleDataRecord>
+         *     <gml:metaDataProperty xlink:title='title' xlink:href='href' />
+         *   </swe:SimpleDataRecord>
+         * </sml:capabilities>
+         */
+        Element parent = getParentNode();
+        parent = addNewNodeToParentWithAttribute("sml:capabilities", parent, "name", name);
+        parent = addNewNodeToParent("swe:SimpleDataRecord", parent);
+        parent = addNewNodeToParentWithAttribute("gml:metaDataProperty", parent, "xlink:title", title);
+        parent.setAttribute("xlink:href", href);
     }
     
     /**
@@ -325,6 +416,19 @@ public class DescribeSensorFormatter implements SOSOutputFormatter {
      */
     public void deleteHistoryNode() {
         getParentNode().removeChild(getParentNode().getElementsByTagName("sml:history").item(0));
+    }
+    
+    public void setSmlLocation(String srsName, String pos) {
+        /*
+         * <sml:location>
+         *   <gml:Point srsName='srsName'>
+         *     <gml:pos>'pos'</gml:pos>
+         *   </gml:Point>
+         * </sml:location
+         */
+        Element parent = (Element) this.document.getElementsByTagName("sml:location");
+        parent = addNewNodeToParentWithAttribute("gml:Point", parent, "srsName", srsName);
+        addNewNodeToParentWithTextValue("gml:pos", parent, pos);
     }
     
     public void setLocationNode2Dimension(String stationName, double[][] coords) {
@@ -471,7 +575,7 @@ public class DescribeSensorFormatter implements SOSOutputFormatter {
             system.setAttribute("gml:id", "sensor-" + fName);
             // identification node
             Element ident = document.createElement("sml:identification");
-            ident.setAttribute("xlink:href", procedure + ":" + fName);
+            ident.setAttribute("xlink:href", procedure.replaceAll(":station:", ":sensor:") + ":" + fName);
             // documentation (url) node
             Element doc = document.createElement("sml:documentation");
             // need to construct url for sensor request
@@ -496,6 +600,14 @@ public class DescribeSensorFormatter implements SOSOutputFormatter {
             component.appendChild(system);
             parent.appendChild(component);
         }
+    }
+    
+    public void addSmlComponent(String compName, String compId, String description, String dsUrl) {
+        
+    }
+    
+    public void addSmlOuptutToComponent(String compName, String outName, String definition, String uom) {
+        
     }
     
     /**

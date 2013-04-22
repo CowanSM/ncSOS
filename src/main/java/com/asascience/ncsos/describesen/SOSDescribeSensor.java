@@ -24,7 +24,7 @@ import ucar.nc2.dataset.NetcdfDataset;
  * @author SCowan
  * @version 1.0.0
  */
-public class SOSDescribeSensor extends SOSDescribeStation implements SOSDescribeIF {
+public class SOSDescribeSensor extends SOSDescribeStation implements ISOSDescribeSensor {
     
     private String sensorId;
     private Variable sensorVariable;

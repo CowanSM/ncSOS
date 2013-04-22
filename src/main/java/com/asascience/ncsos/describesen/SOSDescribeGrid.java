@@ -25,7 +25,7 @@ import ucar.unidata.geoloc.LatLonRect;
  * @author SCowan
  * @version 1.0.0
  */
-public class SOSDescribeGrid extends SOSDescribeStation implements SOSDescribeIF {
+public class SOSDescribeGrid extends SOSDescribeStation implements ISOSDescribeSensor {
     
     private String upperLatitude, upperLongitude, lowerLatitude, lowerLongitude;
     

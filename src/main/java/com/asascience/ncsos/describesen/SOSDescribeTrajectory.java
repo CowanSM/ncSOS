@@ -38,7 +38,7 @@ import ucar.nc2.units.DateFormatter;
  * @author SCowan
  * @version 1.0.0
  */
-public class SOSDescribeTrajectory extends SOSDescribeStation implements SOSDescribeIF {
+public class SOSDescribeTrajectory extends SOSDescribeStation implements ISOSDescribeSensor {
     
     private Variable indexDescriptor;
     private int trajectoryIndex;

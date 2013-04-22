@@ -29,7 +29,7 @@ import ucar.nc2.dataset.NetcdfDataset;
  * @author SCowan
  * @version 1.0.0
  */
-public class SOSDescribeProfile extends SOSDescribeStation implements SOSDescribeIF {
+public class SOSDescribeProfile extends SOSDescribeStation implements ISOSDescribeSensor {
     
     int profileNumber;
     int profileStartIndex, profileEndIndex;

@@ -33,7 +33,7 @@ public abstract class SOSBaseRequestHandler {
     private GridDataset gridDataSet = null;
     
     // Global Attributes
-    protected String Access, DataContactEmail, DataContactName, DataContactPhone, DataPage, InventoryContactEmail, InventoryContactName, InventoryContactPhone;
+    protected String Access, PublisherEmail, PublisherName, PublisherPhone, PublisherURL, CreatorEmail, CreatorName, CreatorPhone;
     protected String PrimaryOwnership, Region, StandardNameVocabulary, title, history, description, featureOfInterestBaseQueryURL, featureType;
     private static String namingAuthority;
     
@@ -149,13 +149,13 @@ public abstract class SOSBaseRequestHandler {
     private void parseGlobalAttributes() {
         
         Access = netCDFDataset.findAttValueIgnoreCase(null, "license", "NONE");
-        DataContactEmail = netCDFDataset.findAttValueIgnoreCase(null, "publisher_email", "");
-        DataContactName = netCDFDataset.findAttValueIgnoreCase(null, "publisher_name", "");
-        DataContactPhone = netCDFDataset.findAttValueIgnoreCase(null, "publisher_phone", "");
-        DataPage = netCDFDataset.findAttValueIgnoreCase(null, "publisher_url", "");
-        InventoryContactEmail = netCDFDataset.findAttValueIgnoreCase(null, "creator_email","");
-        InventoryContactName = netCDFDataset.findAttValueIgnoreCase(null,"creator_name","");
-        InventoryContactPhone = netCDFDataset.findAttValueIgnoreCase(null,"creator_phone","");
+        PublisherEmail = netCDFDataset.findAttValueIgnoreCase(null, "publisher_email", "");
+        PublisherName = netCDFDataset.findAttValueIgnoreCase(null, "publisher_name", "");
+        PublisherPhone = netCDFDataset.findAttValueIgnoreCase(null, "publisher_phone", "");
+        PublisherURL = netCDFDataset.findAttValueIgnoreCase(null, "publisher_url", "");
+        CreatorEmail = netCDFDataset.findAttValueIgnoreCase(null, "creator_email","");
+        CreatorName = netCDFDataset.findAttValueIgnoreCase(null,"creator_name","");
+        CreatorPhone = netCDFDataset.findAttValueIgnoreCase(null,"creator_phone","");
         PrimaryOwnership = netCDFDataset.findAttValueIgnoreCase(null, "source", "");
         Region = netCDFDataset.findAttValueIgnoreCase(null, "institution", "");
         // old attributes, still looking up for now
@@ -510,6 +510,25 @@ public abstract class SOSBaseRequestHandler {
         }
         return null;
     }
+    
+    /**
+     * Attempts to find a global attribute in the dataset.
+     * @param attName name of the attribute
+     * @param defVal value to return if attribute is not found
+     * @return the value of the attribute or defVal
+     */
+    public String getGlobalAttribute(String attName, String defVal){
+        return this.netCDFDataset.findAttValueIgnoreCase(null, attName, defVal);
+    }
+    
+    /**
+     * Attempts to find a variable in the dataset.
+     * @param variableName name of the variable
+     * @return either the variable if found or null
+     */
+    public Variable getVariableByName(String variableName) {
+        return this.netCDFDataset.findVariable(variableName);
+    }
 
     /**
      * Returns the dataset, wrapped according to its feature type
@@ -712,6 +731,21 @@ public abstract class SOSBaseRequestHandler {
     
     public String getFeatureType() {
         return featureType;
+    }
+    
+    /**
+     * Attempts to find an attribute from a given variable
+     * @param variable variable to look in for the attribute
+     * @param attributeName attribute with value desired
+     * @param defaultValue default value if attribute does not exist
+     * @return the string value of the attribute if exists otherwise defaultValue
+     */
+    public static String getValueFromVariableAttribute(VariableSimpleIF variable, String attributeName, String defaultValue) {
+        Attribute attr = variable.findAttributeIgnoreCase(attributeName);
+        if (attr != null) {
+            return attr.getStringValue();
+        }
+        return defaultValue;
     }
 
 }

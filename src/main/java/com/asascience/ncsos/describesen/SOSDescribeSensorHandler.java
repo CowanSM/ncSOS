@@ -27,7 +27,7 @@ public class SOSDescribeSensorHandler extends SOSBaseRequestHandler {
     
     private org.slf4j.Logger _log = org.slf4j.LoggerFactory.getLogger(SOSDescribeSensorHandler.class);
     private String procedure;
-    private SOSDescribeIF describer;
+    private ISOSDescribeSensor describer;
     
     private final String ACCEPTABLE_RESPONSE_FORMAT = "text/xml;subtype=\"sensorML/1.0.1\"";
     
