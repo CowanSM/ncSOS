@@ -177,6 +177,8 @@ public class SOSGetObsTest {
     
     // IoosSos1.0 response format
     private static final String kachemakBay = datasets + "nodc/KachemakBay.nc";
+    private static final String seaMapPoint = datasets + "SEAMAPdataCStructs7.nc";
+    private static final String seaMapPointRequest = IoosSosRequest + "&observedProperty=Air_Temperature&offering=network-all";
     private static final String timeSeriesIncompIoosSosRequest1 = IoosSosRequest + "&observedProperty=temperature,humidity&offering=Station-1,Station-3&eventtime=1990-01-01T00:00:00Z";
     private static final String pointIoosSosRequest1 = IoosSosRequest + "&observedProperty=fluorene&offering=network-all&eventtime=1990-01-01T00:00:48Z";
     private static final String bodegaMarineLabBuoy = datasets + "nodc/BodegaMarineLabBuoy.nc";
@@ -1970,6 +1972,27 @@ public class SOSGetObsTest {
             SOSParser md = new SOSParser();
             Writer write = new CharArrayWriter();
             writeOutput(md.enhanceGETRequest(dataset, ioosTrajectoryProfileRequest, networkAllTrajectoryProfile1), write);
+            write.flush();
+            write.close();
+            String fileName = getCurrentMethod() + ".xml";
+            fileWriter(base, fileName, write);
+            assertTrue("no exception in output", write.toString().contains("Exception"));
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            System.out.println("------END " + getCurrentMethod() + "------");
+        }
+    }
+    
+    @Test
+    public void testIoosSeaMapPoint() {
+        System.out.println("\n------" + getCurrentMethod() + "------");
+        
+        try {
+            NetcdfDataset dataset = NetcdfDataset.openDataset(seaMapPoint);
+            SOSParser md = new SOSParser();
+            Writer write = new CharArrayWriter();
+            writeOutput(md.enhanceGETRequest(dataset, seaMapPointRequest, seaMapPoint), write);
             write.flush();
             write.close();
             String fileName = getCurrentMethod() + ".xml";

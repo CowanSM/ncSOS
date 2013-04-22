@@ -8,12 +8,12 @@
  xmlns:swe = "http://www.opengis.net/swe/1.0.1"
  gml:id="SPOT5_DATA">
     <om:member>
-        <om:Observation>
-            <om:samplingTime></om:samplingTime>
-            <om:procedure></om:procedure>
-            <om:observedProperty></om:observedProperty>
-            <om:featureOfInterest></om:featureOfInterest>
-            <om:result></om:result>
-        </om:Observation>
-    </om:member>
+      <om:Observation>
+        <om:samplingTime></om:samplingTime>
+        <om:procedure></om:procedure>
+        <om:observedProperty></om:observedProperty>
+        <om:featureOfInterest></om:featureOfInterest>
+      <om:result></om:result>
+    </om:Observation>
+  </om:member>
 </om:ObservationCollection>

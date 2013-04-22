@@ -186,7 +186,7 @@ public abstract class SOSBaseRequestHandler {
             // look for cf_role attr
             if (this.stationVariable == null) {
                 for (Attribute attr : var.getAttributes()) {
-                    if(attr.getName().equalsIgnoreCase("cf_role")) {
+                    if(attr.getFullName().equalsIgnoreCase("cf_role")) {
                         this.stationVariable = var;
                         String attrValue = attr.getStringValue().toLowerCase();
                         // parse name based on role
